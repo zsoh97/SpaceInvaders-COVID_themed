@@ -1,4 +1,7 @@
 import pygame
+from pygame.locals import *
+
+flags = FULLSCREEN | DOUBLEBUF
 
 # initialise pygame
 pygame.init()
@@ -6,9 +9,10 @@ pygame.init()
 # create window for gui
 HEIGHT = 600
 WIDTH = 800
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-FACTOR_OF_VIRUSES = 10
-MAX_LEVEL = 1
+screen = pygame.display.set_mode((WIDTH, HEIGHT), flags)
+# screen.set_alpha(None)
+FACTOR_OF_VIRUSES = 8
+MAX_LEVEL = 5
 
 # background
 # background made by Kjpargeter from freepik.com
@@ -50,9 +54,9 @@ def initialise_level(lvl, virusX, virusY, collided, viruses):
     virusY.clear()
     collided.clear()
     for i in range(viruses):
-        virusX.append(initialX + 60 * (i % FACTOR_OF_VIRUSES))
+        virusX.append(initialX + 80 * (i % FACTOR_OF_VIRUSES))
         if i // FACTOR_OF_VIRUSES > 0:
-            virusY.append(initialY + 60 * (i // FACTOR_OF_VIRUSES))
+            virusY.append(initialY + 75 * (i // FACTOR_OF_VIRUSES))
         else:
             virusY.append(initialY)
         collided.append(False)
@@ -65,7 +69,7 @@ class Virus:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.virusImg = pygame.transform.scale(pygame.image.load("virus.png"), (32, 32))
+        self.virusImg = pygame.transform.scale(pygame.image.load("virus.png"), (64, 64))
         self.mask = pygame.mask.from_surface(self.virusImg)
 
     def draw(self):
@@ -145,7 +149,7 @@ def main():
     player.draw(screen)
     player_spd = 4
     bullet = player.bullet
-    num_of_viruses = 10
+    num_of_viruses = FACTOR_OF_VIRUSES
     virusX = []
     virusY = []
     virusX_change = 1
@@ -187,6 +191,7 @@ def main():
             else:
                 level = 1
                 score = 0
+                num_of_viruses = FACTOR_OF_VIRUSES
                 initialise_level(level, virusX, virusY, collided, num_of_viruses)
                 game_over = False
 
@@ -198,6 +203,7 @@ def main():
 
             if virusY[i] > 480:
                 show_final_score(score)
+                game_over = True
                 for j in range(num_of_viruses):
                     if not collided[j]:
                         collided[j] = True
@@ -222,6 +228,8 @@ def main():
                 bullet.state = "ready"
                 score += 1000
                 collided[i] = True
+                virusX[i] = -99999999
+                virusY[i] = -99999999
             virus.draw()
 
         # Bullet movement
